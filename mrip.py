@@ -10,6 +10,7 @@ starting_node = sys.argv[1]
 def main():
     config_lines = getConfig("config.txt")
     i=0
+    print("starting...\n")
     while True:
         #waits 30+R
         wait_time = 30+getInterval()
@@ -30,19 +31,6 @@ def main():
         #constantly sends requests
         sendRequest(sender_ip, destination_ip, request_message)
         print("Wait time: %s secs\n" % (wait_time))
-
-##################################
-#define your topologies edge weightings here
-##################################
-
-"""
-I had continuous issues for this section, but when the server socket
-gets a request message, it will would generate a response message in the format below:
-route_message = "%s %s\n%s %s %s\n" % (sender_ip, number_records, host_ip, number_hops, next_hop)
-If a response message is received, the bellman ford algorithm would update the table
-and execute the final one left at the end of the loop.
-"""
-
 
 #functions
 def getConfig(f):
