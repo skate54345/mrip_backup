@@ -11,8 +11,7 @@ def main():
     config_lines = getConfig("config.txt")
     i=0
     print("starting...\n")
-    #reinitialize current node locally
-    starting_node = sys.argv[1]
+    current_node = sys.argv[1]
     while True:
         #waits 30+R
         wait_time = 30+getInterval()
@@ -21,22 +20,28 @@ def main():
         if(i<8):
             nodes = config_lines[i].split()
         else:
-            print("error")
+            i=0
             break
         #start with user input
-        sender_ip = starting_node
+        sender_ip = current_node
         #set destination to next neighbor
-        destination_ip = getNeighbors(starting_node)[1]
+        destination_ip = getNeighbors(current_node)[1]
+        print(">>>>>>>>>>>>>>>>>>>>>>>>")
         print("source:  "+sender_ip)
         print("dest:    "+destination_ip)
         print("cost:    1")
-        request_message = '"MRIP REQUEST ' + sender_ip + '"'
+        request_message = "MRIP REQUEST " + sender_ip
         #update current node (starting_node) to next step
-        starting_node = destination_ip
+        current_node = destination_ip
         i+=1
         #constantly sends requests
         sendRequest(sender_ip, destination_ip, request_message)
-        print("Wait time: %s secs\n" % (wait_time))
+        print("wait time: %s secs" % (wait_time))
+        print(">>>>>>>>>>>>>>>>>>>>>>>>\n")
+
+        print("<<<<<<<<<<<<<<<<<<<<<<<<")
+        sendRouteMessage(sender_ip, i, destination_ip, getNeighbors(current_node)[1])
+        print("<<<<<<<<<<<<<<<<<<<<<<<<\n")
 
 #functions
 def getConfig(f):
@@ -47,7 +52,6 @@ def getConfig(f):
 #bellman ford
 def getNeighbors(starting_node):
     pair_list = []
-    node_string = ""
     i = 0
     lines = getConfig("config.txt")
     nodes = lines[i].split()
@@ -57,8 +61,8 @@ def getNeighbors(starting_node):
             pair_list.append(nodes)
     #remove current node from pair and grab neighbor
     neighbor_list = [i.replace(starting_node, '').strip() for i in pair_list]
-    print("neighbors: ")
-    print(neighbor_list)
+    #print("neighbors: ")
+    #print(neighbor_list)
     return neighbor_list
 
 
@@ -67,18 +71,22 @@ def getInterval():
     return R
 
 def sendRequest(sender_ip, destination_ip, request_message):
-        #UDP sending
-        UDP_IP = destination_ip
-        UDP_PORT = 5353 #must be 5353
-        MESSAGE = request_message
+    #UDP sending
+    UDP_IP = destination_ip
+    UDP_PORT = 5353 #must be 5353
+    MESSAGE = request_message
 
-        print "UDP target IP:", UDP_IP
-        print "UDP target port:", UDP_PORT
-        print "message:", MESSAGE
+    print "UDP target IP:", UDP_IP
+    print "UDP target port:", UDP_PORT
+    print "message: ", MESSAGE
 
-        sock = socket.socket(socket.AF_INET, #internet
+    sock = socket.socket(socket.AF_INET, #internet
                           socket.SOCK_DGRAM) #UDPs
-        sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+    sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+
+def sendRouteMessage(sender_ip, num, destination_ip, next_neighbor):
+    print("message: ")
+    print("MRIP ROUTE %s %s\n%s 1 %s" % (sender_ip, num, destination_ip, next_neighbor))
 
 def startServer():
     UDP_IP = "10.0.0.0"
@@ -95,5 +103,4 @@ def startServer():
 
         getNeighbors(starting_node)
 
-#startServer()
 main()
