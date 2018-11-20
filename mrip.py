@@ -16,9 +16,11 @@ def main():
     while True:
         #waits 30+R
         wait_time = 30+getInterval()
-        time.sleep(wait_time)
+        #time.sleep(wait_time)
 
         if(i<8):
+            if (i==8):
+                i=0
             nodes = config_lines[i].split()
         else:
             print("error")
