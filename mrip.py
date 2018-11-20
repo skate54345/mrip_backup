@@ -21,6 +21,7 @@ def main():
         if(i<8):
             nodes = config_lines[i].split()
         else:
+            print("error")
             break
         #start with user input
         sender_ip = starting_node
@@ -76,7 +77,7 @@ def sendRequest(sender_ip, destination_ip, request_message):
         print "message:", MESSAGE
 
         sock = socket.socket(socket.AF_INET, #internet
-                          socket.SOCK_DGRAM) #UDP
+                          socket.SOCK_DGRAM) #UDPs
         sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
 
 def startServer():
