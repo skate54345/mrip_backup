@@ -10,6 +10,9 @@ starting_node = sys.argv[1]
 def main():
     config_lines = getConfig("config.txt")
     i=0
+    print("starting...\n")
+    #reinitialize current node locally
+    starting_node = sys.argv[1]
     while True:
         #waits 30+R
         wait_time = 30+getInterval()
@@ -19,30 +22,20 @@ def main():
             nodes = config_lines[i].split()
         else:
             break
-        #determines ips from config
-        sender_ip = nodes[0] #get first value of pair
-        destination_ip = nodes[1]
+        #start with user input
+        sender_ip = starting_node
+        #set destination to next neighbor
+        destination_ip = getNeighbors(starting_node)[1]
         print("source:  "+sender_ip)
         print("dest:    "+destination_ip)
         print("cost:    1")
         request_message = '"MRIP REQUEST ' + sender_ip + '"'
+        #update current node (starting_node) to next step
+        starting_node = destination_ip
         i+=1
         #constantly sends requests
         sendRequest(sender_ip, destination_ip, request_message)
         print("Wait time: %s secs\n" % (wait_time))
-
-##################################
-#define your topologies edge weightings here
-##################################
-
-"""
-I had continuous issues for this section, but when the server socket
-gets a request message, it will would generate a response message in the format below:
-route_message = "%s %s\n%s %s %s\n" % (sender_ip, number_records, host_ip, number_hops, next_hop)
-If a response message is received, the bellman ford algorithm would update the table
-and execute the final one left at the end of the loop.
-"""
-
 
 #functions
 def getConfig(f):
@@ -63,6 +56,7 @@ def getNeighbors(starting_node):
             pair_list.append(nodes)
     #remove current node from pair and grab neighbor
     neighbor_list = [i.replace(starting_node, '').strip() for i in pair_list]
+    print("neighbors: ")
     print(neighbor_list)
     return neighbor_list
 
